@@ -1,0 +1,268 @@
+Death's Activity Economy — Server Setup Guide
+
+This guide explains how to set up server custom content for Death's Activity Economy aliases.
+
+The aliases can use:
+
+- Death's default GVAR content
+- Server custom SVAR content
+- Both together
+
+Servers can also choose whether players see everything by default, or only content unlocked in their character CVAR.
+
+staminaSettings:
+  mode: daily
+  max: 100
+  reset_hour: 0
+  timezone_offset: -5
+  interval_minutes: 0
+  regen_amount: 0
+
+This controls stamina refresh only.
+
+"mode: daily" means stamina resets to full once per server day.
+
+"mode: regen" means stamina regenerates over time using "interval_minutes" and "regen_amount".
+
+Source Control SVAR
+
+Create this server svar:
+
+activitySources
+
+Example:
+
+useGvar: true
+useSvar: false
+priority: svar
+unlockMode: all
+unlockCvar: activity_unlocks
+setupGuideUrl: https://github.com/YOURNAME/YOURREPO/blob/main/activity-server-setup.md
+
+Source Options
+
+useGvar: true
+useSvar: false
+
+Uses Death's default GVAR content only.
+
+useGvar: false
+useSvar: true
+
+Uses server custom SVAR content only.
+
+useGvar: true
+useSvar: true
+
+Uses both Death's default GVAR content and server custom SVAR content.
+
+Priority
+
+priority: svar
+
+If a duplicate item or recipe exists in both the GVAR and SVAR, the server SVAR version wins.
+
+priority: gvar
+
+If a duplicate item or recipe exists in both the GVAR and SVAR, the default GVAR version wins.
+
+Unlock Mode
+
+unlockMode: all
+
+All enabled content is visible and usable.
+
+unlockMode: unlocked
+
+Only content listed in the character's unlock CVAR is visible and usable.
+
+The default unlock CVAR is:
+
+activity_unlocks
+
+Example character CVAR:
+
+[
+  "Copper Ore",
+  "Iron Ore",
+  "Silver Ore",
+  "fish:*",
+  "mine:junk",
+  "bread:*",
+  "moonsteel_smithing"
+]
+
+Fixed Server Content SVAR Names
+
+The aliases check these fixed svar names:
+
+activityServerItems
+activityServerMaterials
+activityServerComponents
+activityServerRecipes
+activityServerGathering
+activityServerOverrides
+
+Servers should use these exact names.
+
+activityServerItems
+
+Use this for general items.
+
+items:
+  Moonsteel Dagger:
+    name: Moonsteel Dagger
+    category: weapon
+    value_cp: 25000
+    description: A pale silver-blue dagger made from moonsteel.
+    image: https://example.com/moonsteel-dagger.png
+
+activityServerMaterials
+
+Use this for raw materials.
+
+materials:
+  Moonsteel Ore:
+    name: Moonsteel Ore
+    category: ore
+    value_cp: 2000
+    description: Rare silver-blue ore found under moonlit stone.
+
+  Moonsteel Ingot:
+    name: Moonsteel Ingot
+    category: metal
+    value_cp: 5000
+    description: A refined ingot used in rare smithing recipes.
+
+activityServerComponents
+
+Use this for crafted parts and intermediate components.
+
+components:
+  Fine Leather Wrap:
+    name: Fine Leather Wrap
+    category: weapon component
+    value_cp: 250
+    description: Treated leather used for grips and handles.
+
+  Weapon Handle:
+    name: Weapon Handle
+    category: weapon component
+    value_cp: 100
+    description: A prepared handle suitable for simple weapons.
+
+activityServerRecipes
+
+Use this for crafting, smithing, weaving, alchemy, bakery, and make recipes.
+
+recipes:
+  Moonsteel Dagger:
+    name: Moonsteel Dagger
+    activity: smithing
+    category: weapon
+    dc: 16
+    cost_gp: 250
+    unlock: moonsteel_smithing
+    materials:
+      Moonsteel Ingot: 1
+      Weapon Handle: 1
+      Fine Leather Wrap: 1
+    result:
+      name: Moonsteel Dagger
+      qty: 1
+
+activityServerGathering
+
+Use this for custom gathering results for fish, mine, forage, bug, wood, track, and similar aliases.
+
+gathering:
+  mine:
+    items:
+      Moonsteel Ore:
+        name: Moonsteel Ore
+        category: ore
+        rarity: rare
+        dc: 18
+        weight: 2
+        value_cp: 2000
+        description: Rare silver-blue ore found under moonlit stone.
+
+  fish:
+    items:
+      Glassfin Trout:
+        name: Glassfin Trout
+        category: fish
+        rarity: uncommon
+        dc: 14
+        weight: 5
+        value_cp: 80
+        description: A translucent river fish with shimmering fins.
+
+activityServerOverrides
+
+Use this to disable, replace, or adjust default content without editing the aliases.
+
+disabled:
+  - Wish Potion
+  - Dragonbone Plate
+
+overrides:
+  Iron Dagger:
+    dc: 14
+    cost_gp: 10
+
+Unlock Examples
+
+Unlock one exact item:
+
+Copper Ore
+
+Unlock all fishing content:
+
+fish:*
+
+Unlock all mining junk content:
+
+mine:junk
+
+Unlock all bread recipes or items:
+
+bread:*
+
+Unlock recipes requiring a special key:
+
+moonsteel_smithing
+
+Recommended Setups
+
+Default System Only
+
+useGvar: true
+useSvar: false
+priority: svar
+unlockMode: all
+unlockCvar: activity_unlocks
+
+Server Custom Content Only
+
+useGvar: false
+useSvar: true
+priority: svar
+unlockMode: all
+unlockCvar: activity_unlocks
+
+Default + Server Custom Content
+
+useGvar: true
+useSvar: true
+priority: svar
+unlockMode: all
+unlockCvar: activity_unlocks
+
+Locked Progression Mode
+
+useGvar: true
+useSvar: true
+priority: svar
+unlockMode: unlocked
+unlockCvar: activity_unlocks
