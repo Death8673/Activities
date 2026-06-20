@@ -37,7 +37,7 @@ useSvar: false
 priority: svar
 unlockMode: all
 unlockCvar: activity_unlocks
-setupGuideUrl: https://github.com/YOURNAME/YOURREPO/blob/main/activity-server-setup.md
+setupGuideUrl: https://github.com/Death8673/Activities/blob/main/Setup
 
 Source Options
 
