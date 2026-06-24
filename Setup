@@ -12,6 +12,8 @@ The system can use:
 
 The visible command layout is not changed by these settings.
 
+---
+
 ## Main Server Settings
 
 ### `activitySources`
@@ -32,15 +34,17 @@ Create this server svar:
 
 `useSvar:false` means the aliases ignore server custom SVAR content.
 
-`priority:"svar"` means if a server item has the same name as a default item, the server version wins.
+`priority:"svar"` means if a server item or recipe has the same name as a default entry, the server version wins.
 
-`priority:"gvar"` means if a server item has the same name as a default item, the default version wins.
+`priority:"gvar"` means if a server item or recipe has the same name as a default entry, the default version wins.
 
 `unlockMode:"unlocked"` means visible content is usable by default unless specifically locked.
 
 `unlockMode:"locked"` means content must be unlocked before it is visible or usable.
 
 `unlockCvar:"activity_unlocks"` is the character cvar used for player-specific unlocks.
+
+---
 
 ## Recommended Normal Setup
 
@@ -52,6 +56,8 @@ Most servers should use:
 
 This uses Death's default content and lets server owners add extra content through svars.
 
+---
+
 ## Server-Only Setup
 
 Use this if the server wants to ignore all default GVAR content and only use custom server svars:
@@ -61,6 +67,8 @@ Use this if the server wants to ignore all default GVAR content and only use cus
 ```
 
 If no server content exists, the activity aliases should show **No Entries** and should not spend stamina.
+
+---
 
 ## Locked Progression Setup
 
@@ -78,6 +86,8 @@ Unlock examples:
 !unlock add Copper Ore
 !unlock add moonsteel_smithing
 ```
+
+---
 
 ## Stamina Settings
 
@@ -103,6 +113,8 @@ This resets stamina to full once per server day.
 
 This regenerates stamina over time.
 
+---
+
 ## Server Content Svars
 
 Server owners can add content with layered svars.
@@ -119,6 +131,8 @@ fish_items_3
 ```
 
 This lets staff split large data into smaller svars.
+
+---
 
 ## Gathering Item Svars
 
@@ -139,16 +153,21 @@ Layered versions also work:
 fish_items_1
 fish_items_2
 fish_items_3
+
 mine_items_1
 mine_items_2
 mine_items_3
 ```
+
+Do **not** use `activity_materials` for normal gathering drops. `activity_materials` is for recipe materials, not fish/mine/forage results.
 
 Example:
 
 ```text
 !svar mine_items {"items":{"Moonsteel Ore":{"name":"Moonsteel Ore","category":"ore","rarity":"rare","dc":18,"weight":2,"value_cp":2000,"description":"Rare silver-blue ore found under moonlit stone.","image":"https://example.com/moonsteel-ore.png","tags":["ore","metal","moonsteel"]}}}
 ```
+
+---
 
 ## Material Svars
 
@@ -171,6 +190,18 @@ make_materials
 bakery_materials
 ```
 
+Layered versions also work:
+
+```text
+smithing_materials_1
+smithing_materials_2
+smithing_materials_3
+
+weaving_materials_1
+weaving_materials_2
+weaving_materials_3
+```
+
 Example:
 
 ```text
@@ -184,6 +215,8 @@ category: sand
 tag: metal
 any_tag: herb
 ```
+
+---
 
 ## Recipe Svars
 
@@ -203,9 +236,41 @@ Layered versions also work:
 smithing_recipes_1
 smithing_recipes_2
 smithing_recipes_3
+
+weaving_recipes_1
+weaving_recipes_2
+weaving_recipes_3
+
+make_recipes_1
+make_recipes_2
+make_recipes_3
+
 alchemy_recipes_1
 alchemy_recipes_2
 alchemy_recipes_3
+
+bakery_recipes_1
+bakery_recipes_2
+bakery_recipes_3
+```
+
+Catalogue can also read shared recipe/component svars:
+
+```text
+activity_recipes
+activity_recipes_1
+activity_recipes_2
+activity_recipes_3
+
+activity_components
+activity_components_1
+activity_components_2
+activity_components_3
+
+activity_finished
+activity_finished_1
+activity_finished_2
+activity_finished_3
 ```
 
 Example smithing recipe:
@@ -231,6 +296,14 @@ Example bakery recipe:
 ```text
 !svar bakery_recipes {"recipes":{"Server Test Bread":{"name":"Server Test Bread","production":"bakery","category":"food","dc":9,"stamina":5,"creates":1,"value_cp":20,"description":"A test loaf from server-only content.","requires":[{"tag":"flour","qty":1},{"category":"water","qty":1}]}}}
 ```
+
+Example make recipe:
+
+```text
+!svar make_recipes {"recipes":{"Server Test Kit":{"name":"Server Test Kit","production":"crafting","category":"tool","dc":10,"stamina":5,"creates":1,"value_cp":500,"description":"A general crafted item that only exists from server svar content.","requires":[{"tag":"wood","qty":1},{"tag":"fibre","qty":1}]}}}
+```
+
+---
 
 ## Lock and Unlock Svars
 
@@ -270,6 +343,8 @@ Example character cvar value:
 ["fish:*","mine:*","Copper Ore","moonsteel_smithing"]
 ```
 
+---
+
 ## Useful Test Commands
 
 After setup, test these:
@@ -305,6 +380,48 @@ After setup, test these:
 !bakery bread
 ```
 
+---
+
+## Server-Only Test Pack
+
+Use this to test whether server-only mode works.
+
+First set:
+
+```text
+!svar activitySources {"useGvar":false,"useSvar":true,"priority":"svar","unlockMode":"unlocked","unlockCvar":"activity_unlocks","setupGuideUrl":"https://github.com/Death8673/Activities/blob/main/Setup"}
+```
+
+Then add a test recipe:
+
+```text
+!svar weaving_recipes {"recipes":{"Server Test Rope":{"name":"Server Test Rope","production":"weaving","category":"adventuring gear","dc":10,"stamina":5,"creates":1,"value_cp":100,"description":"A rope that only exists from server svar content.","requires":[{"tag":"fibre","qty":1}]}}}
+```
+
+And a test material:
+
+```text
+!svar activity_materials {"items":{"Test Fibre":{"name":"Test Fibre","category":"fibre","rarity":"common","value_cp":10,"description":"A test fibre used for server-only weaving.","tags":["fibre","cloth","thread"]}}}
+```
+
+Test:
+
+```text
+!book weaving rope
+!weaving rope
+!catalogue rope
+```
+
+You should see `Server Test Rope`, and no default GVAR rope entries.
+
+When finished testing, switch back:
+
+```text
+!svar activitySources {"useGvar":true,"useSvar":true,"priority":"svar","unlockMode":"unlocked","unlockCvar":"activity_unlocks","setupGuideUrl":"https://github.com/Death8673/Activities/blob/main/Setup"}
+```
+
+---
+
 ## Important Notes
 
 If `useGvar:false` and `useSvar:true`, only server svar content should appear.
@@ -316,3 +433,13 @@ If `unlockMode:"locked"`, locked content should not appear or be usable unless u
 Item and recipe pictures use the large `image`.
 
 Character portraits use the embed thumbnail.
+
+The old svar names below are no longer the recommended setup:
+
+```text
+activityServerGathering
+activityServerRecipes
+activityServerOverrides
+```
+
+Use the layered svar names in this guide instead.
