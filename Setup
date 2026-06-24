@@ -1,268 +1,318 @@
-Death's Activity Economy — Server Setup Guide
+# Death's Activity Economy — Server Setup Guide
 
 This guide explains how to set up server custom content for Death's Activity Economy aliases.
 
-The aliases can use:
+The system can use:
 
-- Death's default GVAR content
-- Server custom SVAR content
-- Both together
+* Death's default GVAR content
+* server custom SVAR content
+* both together
+* locked or unlocked progression
+* layered server content packs
 
-Servers can also choose whether players see everything by default, or only content unlocked in their character CVAR.
+The visible command layout is not changed by these settings.
 
-staminaSettings:
-  mode: daily
-  max: 100
-  reset_hour: 0
-  timezone_offset: -5
-  interval_minutes: 0
-  regen_amount: 0
+## Main Server Settings
 
-This controls stamina refresh only.
-
-"mode: daily" means stamina resets to full once per server day.
-
-"mode: regen" means stamina regenerates over time using "interval_minutes" and "regen_amount".
-
-Source Control SVAR
+### `activitySources`
 
 Create this server svar:
 
-activitySources
+```text
+!svar activitySources {"useGvar":true,"useSvar":true,"priority":"svar","unlockMode":"unlocked","unlockCvar":"activity_unlocks","setupGuideUrl":"https://github.com/Death8673/Activities/blob/main/Setup"}
+```
+
+### Options
+
+`useGvar:true` means the aliases can use Death's default GVAR content.
+
+`useGvar:false` means the aliases ignore Death's default GVAR content.
+
+`useSvar:true` means the aliases can use server custom SVAR content.
+
+`useSvar:false` means the aliases ignore server custom SVAR content.
+
+`priority:"svar"` means if a server item has the same name as a default item, the server version wins.
+
+`priority:"gvar"` means if a server item has the same name as a default item, the default version wins.
+
+`unlockMode:"unlocked"` means visible content is usable by default unless specifically locked.
+
+`unlockMode:"locked"` means content must be unlocked before it is visible or usable.
+
+`unlockCvar:"activity_unlocks"` is the character cvar used for player-specific unlocks.
+
+## Recommended Normal Setup
+
+Most servers should use:
+
+```text
+!svar activitySources {"useGvar":true,"useSvar":true,"priority":"svar","unlockMode":"unlocked","unlockCvar":"activity_unlocks","setupGuideUrl":"https://github.com/Death8673/Activities/blob/main/Setup"}
+```
+
+This uses Death's default content and lets server owners add extra content through svars.
+
+## Server-Only Setup
+
+Use this if the server wants to ignore all default GVAR content and only use custom server svars:
+
+```text
+!svar activitySources {"useGvar":false,"useSvar":true,"priority":"svar","unlockMode":"unlocked","unlockCvar":"activity_unlocks","setupGuideUrl":"https://github.com/Death8673/Activities/blob/main/Setup"}
+```
+
+If no server content exists, the activity aliases should show **No Entries** and should not spend stamina.
+
+## Locked Progression Setup
+
+Use this if players should only see content they have unlocked:
+
+```text
+!svar activitySources {"useGvar":true,"useSvar":true,"priority":"svar","unlockMode":"locked","unlockCvar":"activity_unlocks","setupGuideUrl":"https://github.com/Death8673/Activities/blob/main/Setup"}
+```
+
+Unlock examples:
+
+```text
+!unlock add fish:*
+!unlock add mine:*
+!unlock add Copper Ore
+!unlock add moonsteel_smithing
+```
+
+## Stamina Settings
+
+Create this server svar:
+
+```text
+!svar staminaSettings {"mode":"daily","max":100,"reset_hour":0,"timezone_offset":-5,"interval_minutes":0,"regen_amount":0}
+```
+
+### Daily Mode
+
+```json
+{"mode":"daily","max":100,"reset_hour":0,"timezone_offset":-5,"interval_minutes":0,"regen_amount":0}
+```
+
+This resets stamina to full once per server day.
+
+### Regen Mode
+
+```json
+{"mode":"regen","max":100,"reset_hour":0,"timezone_offset":-5,"interval_minutes":30,"regen_amount":5}
+```
+
+This regenerates stamina over time.
+
+## Server Content Svars
+
+Server owners can add content with layered svars.
+
+The system supports base, `_1`, `_2`, and `_3` versions.
 
 Example:
 
-useGvar: true
-useSvar: false
-priority: svar
-unlockMode: all
-unlockCvar: activity_unlocks
-setupGuideUrl: https://github.com/Death8673/Activities/blob/main/Setup
+```text
+fish_items
+fish_items_1
+fish_items_2
+fish_items_3
+```
 
-Source Options
+This lets staff split large data into smaller svars.
 
-useGvar: true
-useSvar: false
+## Gathering Item Svars
 
-Uses Death's default GVAR content only.
+Use these for gathering aliases:
 
-useGvar: false
-useSvar: true
+```text
+fish_items
+forage_items
+mine_items
+track_items
+bug_items
+wood_items
+```
 
-Uses server custom SVAR content only.
+Layered versions also work:
 
-useGvar: true
-useSvar: true
+```text
+fish_items_1
+fish_items_2
+fish_items_3
+mine_items_1
+mine_items_2
+mine_items_3
+```
 
-Uses both Death's default GVAR content and server custom SVAR content.
+Example:
 
-Priority
+```text
+!svar mine_items {"items":{"Moonsteel Ore":{"name":"Moonsteel Ore","category":"ore","rarity":"rare","dc":18,"weight":2,"value_cp":2000,"description":"Rare silver-blue ore found under moonlit stone.","image":"https://example.com/moonsteel-ore.png","tags":["ore","metal","moonsteel"]}}}
+```
 
-priority: svar
+## Material Svars
 
-If a duplicate item or recipe exists in both the GVAR and SVAR, the server SVAR version wins.
+Use these for materials that can be used in recipes:
 
-priority: gvar
+```text
+activity_materials
+activity_materials_1
+activity_materials_2
+activity_materials_3
+```
 
-If a duplicate item or recipe exists in both the GVAR and SVAR, the default GVAR version wins.
+You can also use activity-specific material svars:
 
-Unlock Mode
+```text
+smithing_materials
+weaving_materials
+alchemy_materials
+make_materials
+bakery_materials
+```
 
-unlockMode: all
+Example:
 
-All enabled content is visible and usable.
+```text
+!svar activity_materials {"items":{"Fine Sand":{"name":"Fine Sand","category":"sand","rarity":"common","value_cp":5,"description":"Fine pale sand useful in glassmaking.","tags":["sand","glassmaking","fine material"]},"Iron Ingot":{"name":"Iron Ingot","category":"metal","rarity":"common","value_cp":100,"description":"A refined bar of iron.","tags":["metal","iron","ingot"]}}}
+```
 
-unlockMode: unlocked
+Tags and categories matter. They allow recipes to use requirements like:
 
-Only content listed in the character's unlock CVAR is visible and usable.
+```yaml
+category: sand
+tag: metal
+any_tag: herb
+```
 
-The default unlock CVAR is:
+## Recipe Svars
 
+Use these for production aliases:
+
+```text
+smithing_recipes
+weaving_recipes
+make_recipes
+alchemy_recipes
+bakery_recipes
+```
+
+Layered versions also work:
+
+```text
+smithing_recipes_1
+smithing_recipes_2
+smithing_recipes_3
+alchemy_recipes_1
+alchemy_recipes_2
+alchemy_recipes_3
+```
+
+Example smithing recipe:
+
+```text
+!svar smithing_recipes {"recipes":{"Moonsteel Dagger":{"name":"Moonsteel Dagger","production":"smithing","category":"weapon","dc":16,"stamina":10,"creates":1,"value_cp":25000,"description":"A pale silver-blue dagger made from moonsteel.","image":"https://example.com/moonsteel-dagger.png","requires":[{"item":"Moonsteel Ingot","qty":1},{"item":"Weapon Handle","qty":1},{"tag":"leather","qty":1}]}}}
+```
+
+Example weaving recipe:
+
+```text
+!svar weaving_recipes {"recipes":{"Silken Test Rope":{"name":"Silken Test Rope","production":"weaving","category":"adventuring gear","dc":12,"stamina":8,"creates":1,"value_cp":1000,"description":"A server-only rope recipe for testing.","requires":[{"tag":"fibre","qty":2},{"item":"Fine Sand","qty":1}]}}}
+```
+
+Example alchemy recipe:
+
+```text
+!svar alchemy_recipes {"recipes":{"Server Healing Salve":{"name":"Server Healing Salve","production":"alchemy","category":"potion","dc":12,"stamina":8,"creates":1,"value_cp":500,"description":"A server-only healing salve.","requires":[{"tag":"herb","qty":2},{"category":"water","qty":1}]}}}
+```
+
+Example bakery recipe:
+
+```text
+!svar bakery_recipes {"recipes":{"Server Test Bread":{"name":"Server Test Bread","production":"bakery","category":"food","dc":9,"stamina":5,"creates":1,"value_cp":20,"description":"A test loaf from server-only content.","requires":[{"tag":"flour","qty":1},{"category":"water","qty":1}]}}}
+```
+
+## Lock and Unlock Svars
+
+Server-wide locks can be added with:
+
+```text
+activity_locks
+activity_locks_1
+activity_locks_2
+activity_locks_3
+```
+
+Example:
+
+```text
+!svar activity_locks ["moonsteel_smithing"]
+```
+
+Server-wide unlocks can be added with:
+
+```text
 activity_unlocks
+activity_unlocks_1
+activity_unlocks_2
+activity_unlocks_3
+```
 
-Example character CVAR:
+Character-specific unlocks use the character cvar named in `activitySources`, usually:
 
-[
-  "Copper Ore",
-  "Iron Ore",
-  "Silver Ore",
-  "fish:*",
-  "mine:junk",
-  "bread:*",
-  "moonsteel_smithing"
-]
+```text
+activity_unlocks
+```
 
-Fixed Server Content SVAR Names
+Example character cvar value:
 
-The aliases check these fixed svar names:
+```json
+["fish:*","mine:*","Copper Ore","moonsteel_smithing"]
+```
 
-activityServerItems
-activityServerMaterials
-activityServerComponents
-activityServerRecipes
-activityServerGathering
-activityServerOverrides
+## Useful Test Commands
 
-Servers should use these exact names.
+After setup, test these:
 
-activityServerItems
+```text
+!stamina
+!fish
+!mine
+!forage
+!track
+!bug
+!wood
 
-Use this for general items.
+!book fish
+!book mine
+!book smithing
+!book weaving
+!book alchemy
+!book bakery
 
-items:
-  Moonsteel Dagger:
-    name: Moonsteel Dagger
-    category: weapon
-    value_cp: 25000
-    description: A pale silver-blue dagger made from moonsteel.
-    image: https://example.com/moonsteel-dagger.png
+!book smithing achievements
+!book weaving achievements
+!book alchemy achievements
 
-activityServerMaterials
+!catalogue sand
+!catalogue healing potion
+!catalogue ready weaving
+!catalogue close weaving
 
-Use this for raw materials.
+!smithing sword
+!weaving rope
+!alchemy salve
+!bakery bread
+```
 
-materials:
-  Moonsteel Ore:
-    name: Moonsteel Ore
-    category: ore
-    value_cp: 2000
-    description: Rare silver-blue ore found under moonlit stone.
+## Important Notes
 
-  Moonsteel Ingot:
-    name: Moonsteel Ingot
-    category: metal
-    value_cp: 5000
-    description: A refined ingot used in rare smithing recipes.
+If `useGvar:false` and `useSvar:true`, only server svar content should appear.
 
-activityServerComponents
+If the server svars are empty, activities should show **No Entries** and should not spend stamina.
 
-Use this for crafted parts and intermediate components.
+If `unlockMode:"locked"`, locked content should not appear or be usable unless unlocked.
 
-components:
-  Fine Leather Wrap:
-    name: Fine Leather Wrap
-    category: weapon component
-    value_cp: 250
-    description: Treated leather used for grips and handles.
+Item and recipe pictures use the large `image`.
 
-  Weapon Handle:
-    name: Weapon Handle
-    category: weapon component
-    value_cp: 100
-    description: A prepared handle suitable for simple weapons.
-
-activityServerRecipes
-
-Use this for crafting, smithing, weaving, alchemy, bakery, and make recipes.
-
-recipes:
-  Moonsteel Dagger:
-    name: Moonsteel Dagger
-    activity: smithing
-    category: weapon
-    dc: 16
-    cost_gp: 250
-    unlock: moonsteel_smithing
-    materials:
-      Moonsteel Ingot: 1
-      Weapon Handle: 1
-      Fine Leather Wrap: 1
-    result:
-      name: Moonsteel Dagger
-      qty: 1
-
-activityServerGathering
-
-Use this for custom gathering results for fish, mine, forage, bug, wood, track, and similar aliases.
-
-gathering:
-  mine:
-    items:
-      Moonsteel Ore:
-        name: Moonsteel Ore
-        category: ore
-        rarity: rare
-        dc: 18
-        weight: 2
-        value_cp: 2000
-        description: Rare silver-blue ore found under moonlit stone.
-
-  fish:
-    items:
-      Glassfin Trout:
-        name: Glassfin Trout
-        category: fish
-        rarity: uncommon
-        dc: 14
-        weight: 5
-        value_cp: 80
-        description: A translucent river fish with shimmering fins.
-
-activityServerOverrides
-
-Use this to disable, replace, or adjust default content without editing the aliases.
-
-disabled:
-  - Wish Potion
-  - Dragonbone Plate
-
-overrides:
-  Iron Dagger:
-    dc: 14
-    cost_gp: 10
-
-Unlock Examples
-
-Unlock one exact item:
-
-Copper Ore
-
-Unlock all fishing content:
-
-fish:*
-
-Unlock all mining junk content:
-
-mine:junk
-
-Unlock all bread recipes or items:
-
-bread:*
-
-Unlock recipes requiring a special key:
-
-moonsteel_smithing
-
-Recommended Setups
-
-Default System Only
-
-useGvar: true
-useSvar: false
-priority: svar
-unlockMode: all
-unlockCvar: activity_unlocks
-
-Server Custom Content Only
-
-useGvar: false
-useSvar: true
-priority: svar
-unlockMode: all
-unlockCvar: activity_unlocks
-
-Default + Server Custom Content
-
-useGvar: true
-useSvar: true
-priority: svar
-unlockMode: all
-unlockCvar: activity_unlocks
-
-Locked Progression Mode
-
-useGvar: true
-useSvar: true
-priority: svar
-unlockMode: unlocked
-unlockCvar: activity_unlocks
+Character portraits use the embed thumbnail.
